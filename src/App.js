@@ -70,7 +70,7 @@ const BuildingPage = () => {
             We're building something amazing for you{dots}
           </p>
           <p className="text-lg opacity-80">
-            Our team is working hard to bring you the best chat experience
+            Mao is working hard to bring you the best chat experience
           </p>
         </div>
 
@@ -128,25 +128,12 @@ const BuildingPage = () => {
           </p>
         </div>
 
-        {/* Contact Info */}
-        <div className="space-y-3">
-          <p className="text-lg font-medium">
-            Want updates?
-          </p>
-          <div className="flex justify-center space-x-4">
-            <button className="bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg">
-              📧 Email Updates
-            </button>
-            <button className="bg-green-500 hover:bg-green-600 px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg">
-              💬 Join Discord
-            </button>
-          </div>
-        </div>
+
 
         {/* Footer */}
         <div className="mt-8 pt-6 border-t border-white/20">
           <p className="text-sm opacity-60">
-            Thank you for your patience • Built with ❤️ by the Termiclad Team
+            Thank you for your patience • Built with ❤️ by the Termiclad Mao
           </p>
         </div>
       </div>
