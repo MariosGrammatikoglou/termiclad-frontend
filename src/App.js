@@ -27,64 +27,127 @@ const isRunningOnVercel = () => {
   // return isVercelDomain || isAnyWwwDomain; // Use this for ALL www domains
 };
 
-// Component to show download message
-const DownloadPage = () => {
+// Component to show building/construction message
+const BuildingPage = () => {
+  const [dots, setDots] = useState('');
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDots(prev => {
+        if (prev === '...') return '';
+        return prev + '.';
+      });
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-5 text-center bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white">
-      <div className="bg-white/10 backdrop-blur-lg p-10 rounded-3xl max-w-lg w-full shadow-2xl">
-        <h1 className="text-5xl font-bold mb-5 bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
-          Termiclad
-        </h1>
-        <p className="text-xl mb-8 opacity-90 leading-relaxed">
-          Experience the best chat application on your desktop and mobile devices
-        </p>
+    <div className="min-h-screen flex flex-col items-center justify-center p-5 text-center bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white">
+      <div className="bg-white/10 backdrop-blur-lg p-12 rounded-3xl max-w-2xl w-full shadow-2xl border border-white/20">
 
-        <div className="mb-8">
-          <h2 className="text-2xl font-semibold mb-6">
-            Download Termiclad App
-          </h2>
-
-          {/* Desktop Download Button */}
-          <div className="mb-4">
-            <a
-              href="#"
-              className="inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-xl text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl m-1"
-            >
-              🖥️ Download for Desktop (.exe)
-            </a>
+        {/* Animated Construction Icon */}
+        <div className="mb-8 relative">
+          <div className="text-8xl mb-4 animate-bounce">
+            🏗️
           </div>
-
-          {/* Play Store Button (for future) */}
-          <div className="mb-4">
-            <a
-              href="#"
-              className="inline-block bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-8 rounded-xl text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl m-1"
-            >
-              📱 Get on Play Store (Coming Soon)
-            </a>
+          <div className="absolute -top-2 -right-2 text-4xl animate-spin">
+            ⚙️
           </div>
         </div>
 
-        <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl mt-6">
-          <h3 className="text-xl font-semibold mb-4">Why Download?</h3>
-          <ul className="text-left space-y-3 list-none">
-            <li className="flex items-center">
-              <span className="mr-3">✨</span>
-              <span>Better performance</span>
-            </li>
-            <li className="flex items-center">
-              <span className="mr-3">🔔</span>
-              <span>Native notifications</span>
-            </li>
-            <li className="flex items-center">
-              <span className="mr-3">🚀</span>
-              <span>Faster loading times</span>
-            </li>
-            <li className="flex items-center">
-              <span className="mr-3">💾</span>
-              <span>Offline capabilities</span>
-            </li>
-          </ul>
+        {/* Main Title */}
+        <h1 className="text-6xl font-bold mb-6 bg-gradient-to-r from-yellow-300 via-orange-300 to-red-300 bg-clip-text text-transparent">
+          Termiclad
+        </h1>
+
+        {/* Status Message */}
+        <div className="mb-8">
+          <h2 className="text-3xl font-semibold mb-4 text-yellow-300">
+            🚧 Under Construction 🚧
+          </h2>
+          <p className="text-xl opacity-90 leading-relaxed mb-4">
+            We're building something amazing for you{dots}
+          </p>
+          <p className="text-lg opacity-80">
+            Our team is working hard to bring you the best chat experience
+          </p>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="mb-8">
+          <div className="bg-white/20 rounded-full h-4 mb-3 overflow-hidden">
+            <div className="bg-gradient-to-r from-green-400 to-blue-500 h-full rounded-full animate-pulse" style={{ width: '75%' }}></div>
+          </div>
+          <p className="text-sm opacity-75">Building Progress: 75%</p>
+        </div>
+
+        {/* What's Coming */}
+        <div className="bg-white/10 backdrop-blur-sm p-8 rounded-2xl mb-8">
+          <h3 className="text-2xl font-semibold mb-6 text-cyan-300">
+            🔥 What's Coming Soon
+          </h3>
+          <div className="grid md:grid-cols-2 gap-4 text-left">
+            <div className="flex items-center space-x-3">
+              <span className="text-2xl">💬</span>
+              <span className="text-lg">Real-time messaging</span>
+            </div>
+            <div className="flex items-center space-x-3">
+              <span className="text-2xl">🎨</span>
+              <span className="text-lg">Beautiful UI/UX</span>
+            </div>
+            <div className="flex items-center space-x-3">
+              <span className="text-2xl">🔒</span>
+              <span className="text-lg">Secure encryption</span>
+            </div>
+            <div className="flex items-center space-x-3">
+              <span className="text-2xl">📱</span>
+              <span className="text-lg">Mobile & desktop apps</span>
+            </div>
+            <div className="flex items-center space-x-3">
+              <span className="text-2xl">🎵</span>
+              <span className="text-lg">Voice & video calls</span>
+            </div>
+            <div className="flex items-center space-x-3">
+              <span className="text-2xl">⚡</span>
+              <span className="text-lg">Lightning fast</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Launch Timeline */}
+        <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 p-6 rounded-2xl mb-8">
+          <h3 className="text-xl font-semibold mb-4 text-pink-300">
+            📅 Expected Launch
+          </h3>
+          <p className="text-2xl font-bold text-yellow-300">
+            Coming Very Soon!
+          </p>
+          <p className="text-sm opacity-75 mt-2">
+            Follow us for updates and be the first to know when we launch
+          </p>
+        </div>
+
+        {/* Contact Info */}
+        <div className="space-y-3">
+          <p className="text-lg font-medium">
+            Want updates?
+          </p>
+          <div className="flex justify-center space-x-4">
+            <button className="bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg">
+              📧 Email Updates
+            </button>
+            <button className="bg-green-500 hover:bg-green-600 px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg">
+              💬 Join Discord
+            </button>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-8 pt-6 border-t border-white/20">
+          <p className="text-sm opacity-60">
+            Thank you for your patience • Built with ❤️ by the Termiclad Team
+          </p>
         </div>
       </div>
     </div>
@@ -157,7 +220,7 @@ function App() {
 
   // Check if running on Vercel - do this after all hooks
   if (isRunningOnVercel()) {
-    return <DownloadPage />;
+    return <BuildingPage />;
   }
 
   if (user && socket) {
