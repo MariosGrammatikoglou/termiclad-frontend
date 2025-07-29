@@ -1,4 +1,3 @@
-// frontend/src/App.js
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import io from 'socket.io-client';
@@ -6,6 +5,9 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Chat from './components/Chat';
 import './App.css';
+import Dashboard from './components/Dashboard';
+import ServerDetails from './components/ServerDetails';
+import CreateServer from './components/CreateServer'; // Import the CreateServer component
 
 const API_BASE = 'https://termiclad-backend.onrender.com';
 
@@ -181,19 +183,21 @@ function App() {
     return <BuildingPage />;
   }
 
-  if (user && socket) {
-    return <Chat user={user} token={token} socket={socket} onLogout={handleLogout} />;
-  }
-
   return (
     <Router>
       <div className="App">
         <div className="auth-container">
-          <Routes>
-            <Route path="/login" element={<Login onLogin={handleLogin} />} />
-            <Route path="/register" element={<Register onRegister={handleLogin} />} />
-            <Route path="/" element={<Login onLogin={handleLogin} />} />
-          </Routes>
+          {user && socket ? (
+            <Dashboard user={user} token={token} socket={socket} onLogout={handleLogout} />
+          ) : (
+            <Routes>
+              <Route path="/login" element={<Login onLogin={handleLogin} />} />
+              <Route path="/register" element={<Register onRegister={handleLogin} />} />
+              <Route path="/" element={<Login onLogin={handleLogin} />} />
+              <Route path="/server/:id" element={<ServerDetails />} />
+              <Route path="/create-server" element={<CreateServer />} /> {/* Add this route */}
+            </Routes>
+          )}
         </div>
       </div>
     </Router>
