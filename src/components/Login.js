@@ -1,6 +1,5 @@
 // frontend/src/components/Login.js
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 
 const API_BASE = 'https://termiclad-backend.onrender.com';
 
@@ -18,7 +17,9 @@ function Login({ onLogin }) {
         try {
             const response = await fetch(`${API_BASE}/api/login`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 body: JSON.stringify({ email, password }),
             });
 
@@ -37,50 +38,37 @@ function Login({ onLogin }) {
     };
 
     return (
-        <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
-            <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
+        <form onSubmit={handleSubmit} className="auth-form">
+            {error && <div className="error-message">{error}</div>}
 
-            {error && <div className="text-red-500 text-center mb-4">{error}</div>}
-
-            <form onSubmit={handleSubmit}>
-                <div className="mb-4">
-                    <label htmlFor="email" className="block text-gray-700 font-semibold">Email</label>
-                    <input
-                        type="email"
-                        id="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        className="w-full p-3 mt-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Enter your email"
-                    />
-                </div>
-
-                <div className="mb-6">
-                    <label htmlFor="password" className="block text-gray-700 font-semibold">Password</label>
-                    <input
-                        type="password"
-                        id="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        className="w-full p-3 mt-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Enter your password"
-                    />
-                </div>
-
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    {loading ? 'Logging in...' : 'Login'}
-                </button>
-            </form>
-
-            <div className="mt-4 text-center">
-                <Link to="/register" className="text-blue-500 hover:underline">Don't have an account? Register here.</Link>
+            <div className="form-group">
+                <label htmlFor="email">Email</label>
+                <input
+                    type="email"
+                    id="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    placeholder="Enter your email"
+                />
             </div>
-        </div>
+
+            <div className="form-group">
+                <label htmlFor="password">Password</label>
+                <input
+                    type="password"
+                    id="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    placeholder="Enter your password"
+                />
+            </div>
+
+            <button type="submit" disabled={loading} className="auth-button">
+                {loading ? 'Logging in...' : 'Login'}
+            </button>
+        </form>
     );
 }
 
