@@ -1,75 +1,79 @@
-// frontend/src/components/Login.js
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const API_BASE = 'https://termiclad-backend.onrender.com';
 
-function Login({ onLogin }) {
+const Login = ({ onLogin }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
+    const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
-        setError('');
+        setError(null);
 
         try {
-            const response = await fetch(`${API_BASE}/api/login`, {
+            const res = await fetch(`${API_BASE}/api/login`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),
             });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                onLogin(data.user, data.token);
-            } else {
-                setError(data.message);
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData.message || 'Login failed');
             }
-        } catch (error) {
-            setError('Connection failed. Please check if the server is running.');
-        } finally {
-            setLoading(false);
+            const data = await res.json();
+            onLogin(data.user, data.token);
+            navigate('/');
+        } catch (err) {
+            setError(err.message);
         }
     };
 
     return (
-        <form onSubmit={handleSubmit} className="auth-form">
-            {error && <div className="error-message">{error}</div>}
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-500 to-pink-500 p-5">
+            <form
+                onSubmit={handleSubmit}
+                className="bg-white rounded-lg p-10 shadow-xl max-w-md w-full space-y-6"
+            >
+                <h2 className="text-3xl font-bold text-center text-purple-700">Login</h2>
+                {error && <p className="text-red-600 font-semibold">{error}</p>}
 
-            <div className="form-group">
-                <label htmlFor="email">Email</label>
                 <input
                     type="email"
-                    id="email"
+                    placeholder="Email"
+                    className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-400"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    placeholder="Enter your email"
                 />
-            </div>
 
-            <div className="form-group">
-                <label htmlFor="password">Password</label>
                 <input
                     type="password"
-                    id="password"
+                    placeholder="Password"
+                    className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-400"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    placeholder="Enter your password"
                 />
-            </div>
 
-            <button type="submit" disabled={loading} className="auth-button">
-                {loading ? 'Logging in...' : 'Login'}
-            </button>
-        </form>
+                <button
+                    type="submit"
+                    className="w-full bg-purple-600 text-white py-3 rounded-md hover:bg-purple-700 transition"
+                >
+                    Log In
+                </button>
+
+                <p className="text-center text-gray-600">
+                    Don't have an account?{' '}
+                    <a href="/register" className="text-purple-600 hover:underline">
+                        Register here
+                    </a>
+                </p>
+            </form>
+        </div>
     );
-}
+};
 
 export default Login;
