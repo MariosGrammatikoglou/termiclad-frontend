@@ -1,27 +1,35 @@
+// frontend/src/App.js
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import io from 'socket.io-client';
 import Login from './components/Login';
 import Register from './components/Register';
-import Dashboard from './components/Dashboard';
+import Chat from './components/Chat';
 import './App.css';
+import Dashboard from './components/Dashboard';
+
 
 const API_BASE = 'https://termiclad-backend.onrender.com';
 
 // Function to detect if running on Vercel
 const isRunningOnVercel = () => {
   const hostname = window.location.hostname;
-  return hostname.includes('vercel.app') || hostname.includes('vercel.com');
+  const isVercelDomain = hostname.includes('vercel.app') || hostname.includes('vercel.com');
+  return isVercelDomain;
 };
 
-// Building page component
+// Component to show building/construction message
 const BuildingPage = () => {
-  const [dots, setDots] = React.useState('');
+  const [dots, setDots] = useState('');
 
-  React.useEffect(() => {
+  useEffect(() => {
     const interval = setInterval(() => {
-      setDots((prev) => (prev === '...' ? '' : prev + '.'));
+      setDots(prev => {
+        if (prev === '...') return '';
+        return prev + '.';
+      });
     }, 500);
+
     return () => clearInterval(interval);
   }, []);
 
@@ -29,8 +37,12 @@ const BuildingPage = () => {
     <div className="min-h-screen flex flex-col items-center justify-center p-5 text-center bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white">
       <div className="bg-white/10 backdrop-blur-lg p-12 rounded-3xl max-w-2xl w-full shadow-2xl border border-white/20">
         <div className="mb-8 relative">
-          <div className="text-8xl mb-4 animate-bounce">🏗️</div>
-          <div className="absolute -top-2 -right-2 text-4xl animate-spin">⚙️</div>
+          <div className="text-8xl mb-4 animate-bounce">
+            🏗️
+          </div>
+          <div className="absolute -top-2 -right-2 text-4xl animate-spin">
+            ⚙️
+          </div>
         </div>
 
         <h1 className="text-6xl font-bold mb-6 bg-gradient-to-r from-yellow-300 via-orange-300 to-red-300 bg-clip-text text-transparent">
@@ -38,11 +50,15 @@ const BuildingPage = () => {
         </h1>
 
         <div className="mb-8">
-          <h2 className="text-3xl font-semibold mb-4 text-yellow-300">🚧 Under Construction 🚧</h2>
+          <h2 className="text-3xl font-semibold mb-4 text-yellow-300">
+            🚧 Under Construction 🚧
+          </h2>
           <p className="text-xl opacity-90 leading-relaxed mb-4">
             We're building something amazing for you{dots}
           </p>
-          <p className="text-lg opacity-80">Mao is working hard to bring you the best chat experience</p>
+          <p className="text-lg opacity-80">
+            Mao is working hard to bring you the best chat experience
+          </p>
         </div>
 
         <div className="mb-8">
@@ -53,7 +69,9 @@ const BuildingPage = () => {
         </div>
 
         <div className="bg-white/10 backdrop-blur-sm p-8 rounded-2xl mb-8">
-          <h3 className="text-2xl font-semibold mb-6 text-cyan-300">🔥 What's Coming Soon</h3>
+          <h3 className="text-2xl font-semibold mb-6 text-cyan-300">
+            🔥 What's Coming Soon
+          </h3>
           <div className="grid md:grid-cols-2 gap-4 text-left">
             <div className="flex items-center space-x-3">
               <span className="text-2xl">💬</span>
@@ -83,13 +101,21 @@ const BuildingPage = () => {
         </div>
 
         <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 p-6 rounded-2xl mb-8">
-          <h3 className="text-xl font-semibold mb-4 text-pink-300">📅 Expected Launch</h3>
-          <p className="text-2xl font-bold text-yellow-300">Coming Very Soon!</p>
-          <p className="text-sm opacity-75 mt-2">Follow us for updates and be the first to know when we launch</p>
+          <h3 className="text-xl font-semibold mb-4 text-pink-300">
+            📅 Expected Launch
+          </h3>
+          <p className="text-2xl font-bold text-yellow-300">
+            Coming Very Soon!
+          </p>
+          <p className="text-sm opacity-75 mt-2">
+            Follow us for updates and be the first to know when we launch
+          </p>
         </div>
 
         <div className="mt-8 pt-6 border-t border-white/20">
-          <p className="text-sm opacity-60">Thank you for your patience • Built with ❤️ by the Termiclad Mao</p>
+          <p className="text-sm opacity-60">
+            Thank you for your patience • Built with ❤️ by the Termiclad Mao
+          </p>
         </div>
       </div>
     </div>
@@ -101,56 +127,45 @@ function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [socket, setSocket] = useState(null);
 
-  // Verify token and get user on mount / token change
   useEffect(() => {
     if (token) {
       fetch(`${API_BASE}/api/users`, {
         headers: {
-          Authorization: `Bearer ${token}`,
-        },
+          'Authorization': `Bearer ${token}`
+        }
       })
-        .then((res) => {
-          if (!res.ok) throw new Error('Token invalid');
-          return res.json();
+        .then(response => {
+          if (response.ok) {
+            const userData = JSON.parse(localStorage.getItem('user'));
+            setUser(userData);
+            const newSocket = io(API_BASE);
+            setSocket(newSocket);
+            if (userData) {
+              newSocket.emit('join_room', userData.id);
+            }
+          } else {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            setToken(null);
+          }
         })
-        .then((userData) => {
-          setUser(userData);
-          localStorage.setItem('user', JSON.stringify(userData));
-        })
-        .catch((err) => {
-          console.error('Token verification failed:', err);
-          setToken(null);
+        .catch(error => {
+          console.error('Token verification failed:', error);
           localStorage.removeItem('token');
           localStorage.removeItem('user');
-          setUser(null);
+          setToken(null);
         });
-    } else {
-      setUser(null);
-      localStorage.removeItem('user');
     }
   }, [token]);
-
-  // Setup socket when user & token ready
-  useEffect(() => {
-    if (user && token) {
-      const newSocket = io(API_BASE, {
-        auth: { token },
-      });
-      setSocket(newSocket);
-      newSocket.emit('join_room', user.id);
-
-      return () => {
-        newSocket.disconnect();
-        setSocket(null);
-      };
-    }
-  }, [user, token]);
 
   const handleLogin = (userData, userToken) => {
     setUser(userData);
     setToken(userToken);
     localStorage.setItem('token', userToken);
     localStorage.setItem('user', JSON.stringify(userData));
+    const newSocket = io(API_BASE);
+    setSocket(newSocket);
+    newSocket.emit('join_room', userData.id);
   };
 
   const handleLogout = () => {
@@ -179,7 +194,7 @@ function App() {
           <Routes>
             <Route path="/login" element={<Login onLogin={handleLogin} />} />
             <Route path="/register" element={<Register onRegister={handleLogin} />} />
-            <Route path="*" element={<Login onLogin={handleLogin} />} />
+            <Route path="/" element={<Login onLogin={handleLogin} />} />
           </Routes>
         </div>
       </div>
