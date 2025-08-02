@@ -1,29 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+// Create axios instance with backend base URL
+const api = axios.create({
+    baseURL: 'http://localhost:5000',  // <-- your backend port
+});
+
 const Dashboard = ({ user, token, socket, onLogout }) => {
     const [servers, setServers] = useState([]);
     const [newServerName, setNewServerName] = useState('');
     const [isCreating, setIsCreating] = useState(false);
     const [error, setError] = useState(null);
 
-    // Fetch servers for user on mount and token/user change
     useEffect(() => {
         if (!user || !token) return;
+
         const fetchServers = async () => {
             try {
-                const res = await axios.get('/api/servers', {
+                const res = await api.get('/api/servers', {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 setServers(res.data.servers);
             } catch (err) {
                 console.error('Failed to fetch servers', err);
+                setError('Failed to fetch servers. Please try again.');
             }
         };
+
         fetchServers();
     }, [user, token]);
 
-    // Handle create server submit
     const handleCreateServer = async (e) => {
         e.preventDefault();
         if (!newServerName.trim()) return;
@@ -32,7 +38,7 @@ const Dashboard = ({ user, token, socket, onLogout }) => {
             setIsCreating(true);
             setError(null);
 
-            const res = await axios.post(
+            const res = await api.post(
                 '/api/create-server',
                 { name: newServerName },
                 {
@@ -43,8 +49,8 @@ const Dashboard = ({ user, token, socket, onLogout }) => {
             setServers((prev) => [...prev, res.data.server]);
             setNewServerName('');
         } catch (err) {
-            console.error(err);
-            setError('Failed to create server');
+            console.error('Failed to create server:', err);
+            setError('Failed to create server. Please try again.');
         } finally {
             setIsCreating(false);
         }
@@ -100,6 +106,7 @@ const Dashboard = ({ user, token, socket, onLogout }) => {
                                 {isCreating ? 'Creating...' : 'Create'}
                             </button>
                         </form>
+
                         {error && <p className="mt-3 text-red-600 font-semibold">{error}</p>}
                     </div>
                 </div>
