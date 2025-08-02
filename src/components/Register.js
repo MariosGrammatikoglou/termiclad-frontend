@@ -1,89 +1,111 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 const API_BASE = 'https://termiclad-backend.onrender.com';
 
-const Register = ({ onRegister }) => {
-    const [name, setName] = useState('');
+function Register({ onRegister }) {
+    const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState(null);
-    const navigate = useNavigate();
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError(null);
+        setError('');
+
+        if (password !== confirmPassword) {
+            setError('Passwords do not match');
+            return;
+        }
+
+        if (password.length < 6) {
+            setError('Password must be at least 6 characters long');
+            return;
+        }
+
+        setLoading(true);
 
         try {
-            const res = await fetch(`${API_BASE}/api/register`, {
+            const response = await fetch(`${API_BASE}/api/register`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, password }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, email, password }),
             });
-            if (!res.ok) {
-                const errData = await res.json();
-                throw new Error(errData.message || 'Registration failed');
+
+            const data = await response.json();
+
+            if (response.ok) {
+                onRegister(data.user, data.token);
+            } else {
+                setError(data.message);
             }
-            const data = await res.json();
-            onRegister(data.user, data.token);
-            navigate('/');
-        } catch (err) {
-            setError(err.message);
+        } catch (error) {
+            setError('Connection failed. Please check if the server is running.');
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-500 to-pink-500 p-5">
-            <form
-                onSubmit={handleSubmit}
-                className="bg-white rounded-lg p-10 shadow-xl max-w-md w-full space-y-6"
-            >
-                <h2 className="text-3xl font-bold text-center text-purple-700">Register</h2>
-                {error && <p className="text-red-600 font-semibold">{error}</p>}
+        <form onSubmit={handleSubmit} className="auth-form">
+            {error && <div className="error-message">{error}</div>}
 
+            <div className="form-group">
+                <label htmlFor="username">Username</label>
                 <input
                     type="text"
-                    placeholder="Name"
-                    className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-400"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    id="username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     required
+                    placeholder="Choose a username"
                 />
+            </div>
 
+            <div className="form-group">
+                <label htmlFor="email">Email</label>
                 <input
                     type="email"
-                    placeholder="Email"
-                    className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                    id="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    placeholder="Enter your email"
                 />
+            </div>
 
+            <div className="form-group">
+                <label htmlFor="password">Password</label>
                 <input
                     type="password"
-                    placeholder="Password"
-                    className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                    id="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    placeholder="Create a password"
                 />
+            </div>
 
-                <button
-                    type="submit"
-                    className="w-full bg-purple-600 text-white py-3 rounded-md hover:bg-purple-700 transition"
-                >
-                    Register
-                </button>
+            <div className="form-group">
+                <label htmlFor="confirmPassword">Confirm Password</label>
+                <input
+                    type="password"
+                    id="confirmPassword"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    placeholder="Confirm your password"
+                />
+            </div>
 
-                <p className="text-center text-gray-600">
-                    Already have an account?{' '}
-                    <a href="/login" className="text-purple-600 hover:underline">
-                        Log in here
-                    </a>
-                </p>
-            </form>
-        </div>
+            <button type="submit" disabled={loading} className="auth-button">
+                {loading ? 'Creating Account...' : 'Register'}
+            </button>
+        </form>
     );
-};
+}
 
 export default Register;
