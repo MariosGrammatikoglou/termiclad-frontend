@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // Importing useNavigate
 import axios from 'axios';
 
-// Create axios instance with backend base URL
 const api = axios.create({
     baseURL: 'http://localhost:5000',  // <-- your backend port
 });
@@ -11,6 +11,7 @@ const Dashboard = ({ user, token, socket, onLogout }) => {
     const [newServerName, setNewServerName] = useState('');
     const [isCreating, setIsCreating] = useState(false);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();  // Hook to navigate to server chat page
 
     useEffect(() => {
         if (!user || !token) return;
@@ -38,13 +39,9 @@ const Dashboard = ({ user, token, socket, onLogout }) => {
             setIsCreating(true);
             setError(null);
 
-            const res = await api.post(
-                '/api/create-server',
-                { name: newServerName },
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
+            const res = await api.post('/api/create-server', { name: newServerName }, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
 
             setServers((prev) => [...prev, res.data.server]);
             setNewServerName('');
@@ -56,6 +53,11 @@ const Dashboard = ({ user, token, socket, onLogout }) => {
         }
     };
 
+    const handleServerClick = (serverId) => {
+        // Navigate to the server's chat page when clicked
+        navigate(`/server/${serverId}`);
+    };
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-[#ff9a8b] via-[#fad0c4] to-[#ffb3c6] p-8">
             <div className="bg-white/90 p-8 rounded-3xl shadow-xl max-w-4xl mx-auto">
@@ -64,10 +66,7 @@ const Dashboard = ({ user, token, socket, onLogout }) => {
                         <h1 className="text-4xl font-bold text-gray-800">
                             Welcome to Termiclad, {user ? user.name : 'User'}!
                         </h1>
-                        <button
-                            onClick={onLogout}
-                            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
-                        >
+                        <button onClick={onLogout} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition">
                             Logout
                         </button>
                     </div>
@@ -81,7 +80,8 @@ const Dashboard = ({ user, token, socket, onLogout }) => {
                                 {servers.map((server) => (
                                     <li
                                         key={server.id}
-                                        className="bg-purple-200 text-purple-900 px-4 py-3 rounded-lg font-semibold"
+                                        className="bg-purple-200 text-purple-900 px-4 py-3 rounded-lg font-semibold cursor-pointer"
+                                        onClick={() => handleServerClick(server.id)} // Click handler for navigation
                                     >
                                         {server.name}
                                     </li>
